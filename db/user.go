@@ -17,7 +17,7 @@ type userRepository struct {
 	tableName string
 }
 
-func NewUserRepository(table string) models.InterfaceDBUser {
+func NewDataBaseConn(table string) models.InterfaceDBUser {
 	return &userRepository{
 		DB:        dynamodb.New(session.New(), aws.NewConfig().WithRegion(os.Getenv("AWS_REGION"))),
 		tableName: table,
