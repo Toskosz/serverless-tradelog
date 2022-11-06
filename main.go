@@ -11,8 +11,8 @@ import (
 func handler(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	dbConn := db.NewDataBaseConn("user")
-	userService := services.NewUserService(dbConn)
+	userData := db.NewUserDBConn("user")
+	userService := services.NewUserService(userData)
 	h := handlers.NewHandler(userService)
 
 	if req.HTTPMethod == "POST" && req.Path == "/register" {

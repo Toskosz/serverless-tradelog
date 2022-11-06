@@ -12,19 +12,22 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type userRepository struct {
+type userRecords struct {
 	DB        *dynamodb.DynamoDB
 	tableName string
 }
 
-func NewDataBaseConn(table string) models.InterfaceDBUser {
-	return &userRepository{
-		DB:        dynamodb.New(session.New(), aws.NewConfig().WithRegion(os.Getenv("AWS_REGION"))),
+func NewUserDBConn(table string) models.InterfaceDBUser {
+	return &userRecords{
+		DB: dynamodb.New(
+			session.New(),
+			aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")),
+		),
 		tableName: table,
 	}
 }
 
-func (r *userRepository) FindUserByEmail(email string) (*models.User, error) {
+func (r *userRecords) FindUserByEmail(email string) (*models.User, error) {
 
 	user := &models.User{}
 
@@ -49,7 +52,7 @@ func (r *userRepository) FindUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) GetUserById(id int) (*models.User, error) {
+func (r *userRecords) GetUserById(id int) (*models.User, error) {
 	user := &models.User{}
 	userId := strconv.Itoa(id)
 
@@ -74,7 +77,7 @@ func (r *userRepository) GetUserById(id int) (*models.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) CreateUser(user *models.User) (*models.User, error) {
+func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 
 	currentUser, err := r.FindUserByEmail(user.Email)
 	if err == nil {
