@@ -1,5 +1,17 @@
 package models
 
+type InterfaceDBUser interface {
+	GetUserById(id int) (*User, error)
+	CreateUser(user *User) (*User, error)
+	FindUserByEmail(email string) (*User, error)
+}
+
+type InterfaceUserService interface {
+	GetUserById(id int) (*User, error)
+	Register(user *User) (*User, error)
+	Login(email, password string) (*User, error)
+}
+
 type User struct {
 	Id       uint   `json:"id"`
 	Name     string `json:"name"`
