@@ -15,13 +15,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GetUserById(req events.APIGatewayProxyRequest) (
+func (h *Handler) GetUserById(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	id := req.PathParameters["user-id"]
 	userId, _ := strconv.Atoi(id)
 
-	user, err := services.GetUserById(userId)
+	user, err := h.userService.GetUserById(userId)
 	if err != nil {
 		return services.ApiResponse(http.StatusNotFound,
 			api_error.NewNotFound("user", id))
@@ -41,7 +41,7 @@ func (r *loginInput) sanitize() {
 	r.Password = strings.TrimSpace(r.Password)
 }
 
-func Login(req events.APIGatewayProxyRequest) (
+func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	var jsonData loginInput
@@ -52,7 +52,7 @@ func Login(req events.APIGatewayProxyRequest) (
 	}
 
 	jsonData.sanitize()
-	user, err := services.Login(jsonData.Email, jsonData.Password)
+	user, err := h.userService.Login(jsonData.Email, jsonData.Password)
 
 	if err != nil {
 		return services.ApiResponse(http.StatusBadRequest, err)
@@ -88,7 +88,7 @@ func (r *registerInput) sanitize() {
 	r.Password = strings.TrimSpace(r.Password)
 }
 
-func Register(req events.APIGatewayProxyRequest) (
+func (h *Handler) Register(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	var jsonData registerInput
@@ -104,7 +104,7 @@ func Register(req events.APIGatewayProxyRequest) (
 		Email:    jsonData.Email,
 		Password: jsonData.Password,
 	}
-	user, err := services.Register(registerUserPayload)
+	user, err := h.userService.Register(registerUserPayload)
 
 	if err != nil {
 		if err.Error() == api_error.DuplicateEmailError {
@@ -117,7 +117,7 @@ func Register(req events.APIGatewayProxyRequest) (
 	return services.ApiResponse(http.StatusCreated, user)
 }
 
-func Logout(req events.APIGatewayProxyRequest) (
+func (h *Handler) Logout(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	cookie := []string{"jwt=; Expires: " + time.Now().Add(-time.Hour).Format(
