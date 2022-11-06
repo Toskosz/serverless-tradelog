@@ -1,6 +1,7 @@
 package api_error
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -48,6 +49,14 @@ func (e *Error) Status() int {
 	default:
 		return http.StatusInternalServerError
 	}
+}
+
+func Status(err error) int {
+	var e *Error
+	if errors.As(err, &e) {
+		return e.Status()
+	}
+	return http.StatusInternalServerError
 }
 
 func NewAuthorization(reason string) *Error {

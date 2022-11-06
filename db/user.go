@@ -12,11 +12,22 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-var db = dynamodb.New(session.New(), aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+type userRecords struct {
+	DB        *dynamodb.DynamoDB
+	tableName string
+}
 
-const tableName = ""
+func NewUserDBConn(table string) models.InterfaceDBUser {
+	return &userRecords{
+		DB: dynamodb.New(
+			session.New(),
+			aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")),
+		),
+		tableName: table,
+	}
+}
 
-func FindUserByEmail(email string) (*models.User, error) {
+func (r *userRecords) FindUserByEmail(email string) (*models.User, error) {
 
 	user := &models.User{}
 
@@ -26,10 +37,10 @@ func FindUserByEmail(email string) (*models.User, error) {
 				S: aws.String(email),
 			},
 		},
-		TableName: aws.String(tableName),
+		TableName: aws.String(r.tableName),
 	}
 
-	userItem, err := db.GetItem(input)
+	userItem, err := r.DB.GetItem(input)
 	if err != nil {
 		return user, api_error.NewInternal()
 	}
@@ -41,7 +52,7 @@ func FindUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func GetUserById(id int) (*models.User, error) {
+func (r *userRecords) GetUserById(id int) (*models.User, error) {
 	user := &models.User{}
 	userId := strconv.Itoa(id)
 
@@ -51,10 +62,10 @@ func GetUserById(id int) (*models.User, error) {
 				N: aws.String(userId),
 			},
 		},
-		TableName: aws.String(tableName),
+		TableName: aws.String(r.tableName),
 	}
 
-	userItem, err := db.GetItem(input)
+	userItem, err := r.DB.GetItem(input)
 	if err != nil {
 		return user, api_error.NewInternal()
 	}
@@ -66,9 +77,9 @@ func GetUserById(id int) (*models.User, error) {
 	return user, nil
 }
 
-func CreateUser(user *models.User) (*models.User, error) {
+func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 
-	currentUser, err := FindUserByEmail(user.Email)
+	currentUser, err := r.FindUserByEmail(user.Email)
 	if err == nil {
 		if currentUser != nil && len(currentUser.Email) != 0 {
 			return nil, api_error.NewBadRequest(api_error.DuplicateEmailError)
@@ -84,9 +95,9 @@ func CreateUser(user *models.User) (*models.User, error) {
 	}
 	dynamoInput := &dynamodb.PutItemInput{
 		Item:      dynamoItem,
-		TableName: aws.String(tableName),
+		TableName: aws.String(r.tableName),
 	}
-	_, err = db.PutItem(dynamoInput)
+	_, err = r.DB.PutItem(dynamoInput)
 	if err != nil {
 		return nil, api_error.NewInternal()
 	}
