@@ -34,3 +34,7 @@ func Register(user *models.User) (*models.User, error) {
 
 	return db.CreateUser(user)
 }
+
+func GetUserById(id int) (*models.User, error) {
+	return db.GetUserById(id)
+}
