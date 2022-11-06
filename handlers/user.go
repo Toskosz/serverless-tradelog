@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Toskosz/everythingreviewed/models"
 	"github.com/Toskosz/everythingreviewed/models/api_error"
 	"github.com/Toskosz/everythingreviewed/services"
 	"github.com/aws/aws-lambda-go/events"
@@ -65,10 +66,62 @@ func Login(req events.APIGatewayProxyRequest) (
 	token, err := claims.SignedString([]byte(os.Getenv("")))
 
 	if err != nil {
-		return services.ApiResponse(http.StatusInternalServerError, api_error.NewInternal())
+		return services.ApiResponse(http.StatusInternalServerError,
+			api_error.NewInternal())
 	}
 
 	cookie := []string{"jwt=" + token}
 
 	return services.ApiResponseWithCookies(http.StatusOK, cookie, user)
+}
+
+type registerInput struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (r *registerInput) sanitize() {
+	r.Username = strings.TrimSpace(r.Username)
+	r.Email = strings.TrimSpace(r.Email)
+	r.Email = strings.ToLower(r.Email)
+	r.Password = strings.TrimSpace(r.Password)
+}
+
+func Register(req events.APIGatewayProxyRequest) (
+	*events.APIGatewayProxyResponse, error) {
+
+	var jsonData registerInput
+
+	if err := json.Unmarshal([]byte(req.Body), &jsonData); err != nil {
+		return services.ApiResponse(http.StatusBadRequest,
+			api_error.NewBadRequest("Bad payload"))
+	}
+
+	jsonData.sanitize()
+	registerUserPayload := &models.User{
+		Username: jsonData.Username,
+		Email:    jsonData.Email,
+		Password: jsonData.Password,
+	}
+	user, err := services.Register(registerUserPayload)
+
+	if err != nil {
+		if err.Error() == api_error.DuplicateEmailError {
+			return services.ApiResponse(api_error.Status(err), err)
+		} else {
+			return services.ApiResponse(api_error.Status(err), err)
+		}
+	}
+
+	return services.ApiResponse(http.StatusCreated, user)
+}
+
+func Logout(req events.APIGatewayProxyRequest) (
+	*events.APIGatewayProxyResponse, error) {
+
+	cookie := []string{"jwt=; Expires: " + time.Now().Add(-time.Hour).Format(
+		"Mon, 02 Jan 2006 15:04:05 MST",
+	)}
+	return services.ApiResponseWithCookies(http.StatusOK, cookie, "Logged out")
 }
