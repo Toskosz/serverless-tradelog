@@ -15,7 +15,8 @@ func NewUserService(conn models.InterfaceDBUser) models.InterfaceUserService {
 	}
 }
 
-func (s *userService) Login(email string, password string) (*models.User, error) {
+func (s *userService) Login(email string, password string) (
+	*models.User, error) {
 	user, err := s.dbConn.FindUserByEmail(email)
 	if err != nil {
 		return nil, api_error.NewAuthorization(api_error.InvalidCredentialsError)
