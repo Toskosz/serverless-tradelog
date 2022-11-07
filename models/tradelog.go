@@ -5,15 +5,19 @@ import "time"
 type Timestamp time.Time
 
 type InterfaceDBLog interface {
-	GetUserById(id int) (*User, error)
-	CreateUser(user *User) (*User, error)
-	FindUserByEmail(email string) (*User, error)
+	GetLogById(id int) (*TradeLog, error)
+	GetLogsByUserId(userId int) ([]*TradeLog, error)
+	CreateLog(log *TradeLog) (*TradeLog, error)
+	UpdateLog(log *TradeLog) (*TradeLog, error)
+	DeleteLog(logId int) error
 }
 
 type InterfaceLogService interface {
-	GetUserById(id int) (*User, error)
-	Register(user *User) (*User, error)
-	Login(email, password string) (*User, error)
+	GetLog(id int) (*TradeLog, error)
+	GetUserLogs(userId int) ([]*TradeLog, error)
+	Create(log *TradeLog) (*TradeLog, error)
+	Update(log *TradeLog) (*TradeLog, error)
+	Delete(logId int) error
 }
 
 type TradeLog struct {
@@ -29,4 +33,5 @@ type TradeLog struct {
 	PrecoVenda          float32   `json:"preco-venda"`
 	TimestampAbertura   Timestamp `json:"hora-abertura"`
 	TimestampFechamento Timestamp `json:"hora-fechamento"`
+	Desc                string    `json:"descricao"`
 }
