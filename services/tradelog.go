@@ -30,6 +30,6 @@ func (s *logService) GetLog(id int) (*models.TradeLog, error) {
 	return s.dbConn.GetLogById(id)
 }
 
-func (s *logService) GetUserLogs(userId int) ([]*models.TradeLog, error) {
+func (s *logService) GetUserLogs(userId int) (*[]models.TradeLog, error) {
 	return s.dbConn.GetLogsByUserId(userId)
 }
