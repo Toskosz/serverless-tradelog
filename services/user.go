@@ -1,8 +1,11 @@
 package services
 
 import (
+	"os"
+
 	"github.com/Toskosz/everythingreviewed/models"
 	"github.com/Toskosz/everythingreviewed/models/api_error"
+	"github.com/golang-jwt/jwt"
 )
 
 type userService struct {
@@ -47,4 +50,23 @@ func (s *userService) Register(user *models.User) (*models.User, error) {
 
 func (s *userService) GetUserById(id int) (*models.User, error) {
 	return s.dbConn.GetUserById(id)
+}
+
+func (s *userService) GetUserFromToken(tokenString string) (string, error) {
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// check token signing method etc
+		return []byte(os.Getenv("")), nil
+	})
+
+	if err != nil {
+		return "", api_error.NewAuthorization("failed to get user from token")
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username := claims["Issuer"].(string)
+		return username, nil
+	} else {
+		return "", api_error.NewAuthorization("failed to get user from token")
+	}
 }
