@@ -102,35 +102,43 @@ func (r *logRecords) CreateLog(log *models.TradeLog) (*models.TradeLog, error) {
 }
 
 func (r *logRecords) UpdateLog(log *models.TradeLog) (*models.TradeLog, error) {
-	currentLog, _ := r.GetLog(log.Username, log.TimestampAbertura)
-	if currentLog != nil && len(currentLog.Ativo) == 0 {
-		return nil,
-			api_error.NewNotFound("Log abertura", log.TimestampAbertura)
-	}
 
-	av, err := dynamodbattribute.MarshalMap(log)
-	if err != nil {
-		return nil, api_error.NewBadRequest("Unable to marshall")
-	}
-
-	input := &dynamodb.PutItemInput{
-		Item:      av,
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":r": {
+				BOOL: aws.Bool(log.Revisado),
+			},
+			":d": {
+				S: aws.String(log.Desc),
+			},
+		},
 		TableName: aws.String(r.tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Username": {
+				S: aws.String(log.Username),
+			},
+			"Abertura": {
+				S: aws.String(log.TimestampAbertura),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("SET Revisado = :r, Desc = :d"),
 	}
 
-	_, err = r.DB.PutItem(input)
+	_, err := r.DB.UpdateItem(input)
 	if err != nil {
 		return nil, api_error.NewInternal()
 	}
+
 	return log, nil
 }
 
-func (r *logRecords) DeleteLog(aberturaTs string) error {
+func (r *logRecords) DeleteLog(username string, aberturaTs string) error {
 
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"Username": {
-				N: aws.String(aberturaTs),
+				N: aws.String(username),
 			},
 			"Abertura": {
 				N: aws.String(aberturaTs),

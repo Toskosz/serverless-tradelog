@@ -22,8 +22,8 @@ func (s *logService) Update(log *models.TradeLog) (*models.TradeLog, error) {
 	return s.dbConn.UpdateLog(log)
 }
 
-func (s *logService) Delete(aberturaTs string) error {
-	return s.dbConn.DeleteLog(aberturaTs)
+func (s *logService) Delete(username string, aberturaTs string) error {
+	return s.dbConn.DeleteLog(username, aberturaTs)
 }
 
 func (s *logService) GetLog(username string, aberturaTs string) (*models.TradeLog, error) {
