@@ -1,24 +1,25 @@
 package models
 
 type InterfaceDBLog interface {
-	GetLogById(id int) (*TradeLog, error)
-	GetLogsByUserId(userId int) (*[]TradeLog, error)
+	GetLog(username string, aberturaTs string) (*TradeLog, error)
+	GetLogsByUsername(username string) (*[]TradeLog, error)
 	CreateLog(log *TradeLog) (*TradeLog, error)
 	UpdateLog(log *TradeLog) (*TradeLog, error)
-	DeleteLog(logId int) error
+	DeleteLog(aberturaTs string) error
 }
 
 type InterfaceLogService interface {
-	GetLog(id int) (*TradeLog, error)
-	GetUserLogs(userId int) (*[]TradeLog, error)
+	GetLog(username string, aberturaTs string) (*TradeLog, error)
+	GetUserLogs(username string) (*[]TradeLog, error)
 	Create(log *TradeLog) (*TradeLog, error)
 	Update(log *TradeLog) (*TradeLog, error)
-	Delete(logId int) error
+	Delete(aberturaTs string) error
 }
 
 type TradeLog struct {
-	Id                  uint64  `json:"id"`
-	UserId              string  `json:"user-id" gorm:"unique"`
+	Username            string  `json:"user-id"`
+	TimestampAbertura   string  `json:"hora-abertura"`
+	TimestampFechamento string  `json:"hora-fechamento"`
 	Ativo               string  `json:"ativo"`
 	Resultado           string  `json:"resultado"`
 	Contratos           int     `json:"contratos"`
@@ -27,7 +28,5 @@ type TradeLog struct {
 	TempoOperacao       int     `json:"duracao"`
 	PrecoCompra         float32 `json:"preco-compra"`
 	PrecoVenda          float32 `json:"preco-venda"`
-	TimestampAbertura   string  `json:"hora-abertura"`
-	TimestampFechamento string  `json:"hora-fechamento"`
 	Desc                string  `json:"descricao"`
 }
