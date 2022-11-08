@@ -22,14 +22,14 @@ func (s *logService) Update(log *models.TradeLog) (*models.TradeLog, error) {
 	return s.dbConn.UpdateLog(log)
 }
 
-func (s *logService) Delete(logId int) error {
-	return s.dbConn.DeleteLog(logId)
+func (s *logService) Delete(aberturaTs string) error {
+	return s.dbConn.DeleteLog(aberturaTs)
 }
 
-func (s *logService) GetLog(id int) (*models.TradeLog, error) {
-	return s.dbConn.GetLogById(id)
+func (s *logService) GetLog(username string, aberturaTs string) (*models.TradeLog, error) {
+	return s.dbConn.GetLog(username, aberturaTs)
 }
 
-func (s *logService) GetUserLogs(userId int) (*[]models.TradeLog, error) {
-	return s.dbConn.GetLogsByUserId(userId)
+func (s *logService) GetUserLogs(username string) (*[]models.TradeLog, error) {
+	return s.dbConn.GetLogsByUsername(username)
 }
