@@ -23,8 +23,7 @@ func (h *Handler) GetUserById(req events.APIGatewayProxyRequest) (
 
 	user, err := h.userService.GetUserById(userId)
 	if err != nil {
-		return services.ApiResponse(http.StatusNotFound,
-			api_error.NewNotFound("user", id))
+		return services.ApiResponse(api_error.Status(err), err)
 	}
 
 	return services.ApiResponse(http.StatusOK, user)
