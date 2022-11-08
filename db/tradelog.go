@@ -2,7 +2,6 @@ package db
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/Toskosz/everythingreviewed/models"
 	"github.com/Toskosz/everythingreviewed/models/api_error"
@@ -28,13 +27,17 @@ func NewTradeLogDBConn(table string) models.InterfaceDBLog {
 	}
 }
 
-func (r *logRecords) GetLogById(id int) (*models.TradeLog, error) {
+func (r *logRecords) GetLog(username string, aberturaTs string) (
+	*models.TradeLog, error) {
 	log := &models.TradeLog{}
 
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				N: aws.String(strconv.Itoa(id)),
+			"Username": {
+				N: aws.String(username),
+			},
+			"Abertura": {
+				N: aws.String(aberturaTs),
 			},
 		},
 		TableName: aws.String(r.tableName),
@@ -46,14 +49,16 @@ func (r *logRecords) GetLogById(id int) (*models.TradeLog, error) {
 	}
 
 	if logItem.Item == nil {
-		return log, api_error.NewNotFound("log-id", strconv.Itoa(id))
+		return log, api_error.NewNotFound("log abertura", aberturaTs)
 	}
 
 	return log, nil
 }
 
-func (r *logRecords) GetLogsByUserId(userId int) (*[]models.TradeLog, error) {
-	filt := expression.Name("UserId").Equal(expression.Value(userId))
+func (r *logRecords) GetLogsByUsername(username string) (
+	*[]models.TradeLog, error) {
+
+	filt := expression.Name("Username").Equal(expression.Value(username))
 	expr, err := expression.NewBuilder().WithFilter(filt).Build()
 	if err != nil {
 		return nil, api_error.NewInternal()
@@ -97,10 +102,10 @@ func (r *logRecords) CreateLog(log *models.TradeLog) (*models.TradeLog, error) {
 }
 
 func (r *logRecords) UpdateLog(log *models.TradeLog) (*models.TradeLog, error) {
-	currentLog, _ := r.GetLogById(int(log.Id))
+	currentLog, _ := r.GetLog(log.Username, log.TimestampAbertura)
 	if currentLog != nil && len(currentLog.Ativo) == 0 {
 		return nil,
-			api_error.NewNotFound("Log record", strconv.FormatUint(log.Id, 10))
+			api_error.NewNotFound("Log abertura", log.TimestampAbertura)
 	}
 
 	av, err := dynamodbattribute.MarshalMap(log)
@@ -120,12 +125,15 @@ func (r *logRecords) UpdateLog(log *models.TradeLog) (*models.TradeLog, error) {
 	return log, nil
 }
 
-func (r *logRecords) DeleteLog(logId int) error {
+func (r *logRecords) DeleteLog(aberturaTs string) error {
 
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				N: aws.String(strconv.Itoa(logId)),
+			"Username": {
+				N: aws.String(aberturaTs),
+			},
+			"Abertura": {
+				N: aws.String(aberturaTs),
 			},
 		},
 		TableName: aws.String(r.tableName),
@@ -139,7 +147,7 @@ func (r *logRecords) DeleteLog(logId int) error {
 
 	// Tried to delete item not present
 	if itemDeleted == nil {
-		return api_error.NewNotFound("Log record", strconv.Itoa(logId))
+		return api_error.NewNotFound("Log abertura", aberturaTs)
 	}
 
 	return nil
