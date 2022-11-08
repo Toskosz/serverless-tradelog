@@ -10,6 +10,7 @@ type InterfaceUserService interface {
 	GetUserById(id int) (*User, error)
 	Register(user *User) (*User, error)
 	Login(email, password string) (*User, error)
+	GetUserFromToken(tokenString string) (string, error)
 }
 
 type User struct {
