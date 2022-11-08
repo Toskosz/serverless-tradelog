@@ -58,7 +58,7 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.Id)),
+		Issuer:    user.Username,
 		ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
 	})
 
