@@ -11,11 +11,14 @@ import (
 
 type Handler struct {
 	userService models.InterfaceUserService
+	logService  models.InterfaceLogService
 }
 
-func NewHandler(user models.InterfaceUserService) Handler {
+func NewHandler(user models.InterfaceUserService,
+	log models.InterfaceLogService) Handler {
 	return Handler{
 		userService: user,
+		logService:  log,
 	}
 }
 

@@ -10,12 +10,13 @@ type InterfaceUserService interface {
 	GetUserById(id int) (*User, error)
 	Register(user *User) (*User, error)
 	Login(email, password string) (*User, error)
+	GetUserFromToken(tokenString string) (string, error)
 }
 
 type User struct {
-	Id       uint   `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username" gorm:"unique"`
-	Email    string `json:"email" gorm:"unique"`
-	Password string `gorm:"not null;default:null"`
+	Username  string `json:"username"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	CreatedAt string
 }

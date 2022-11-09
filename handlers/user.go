@@ -23,8 +23,7 @@ func (h *Handler) GetUserById(req events.APIGatewayProxyRequest) (
 
 	user, err := h.userService.GetUserById(userId)
 	if err != nil {
-		return services.ApiResponse(http.StatusNotFound,
-			api_error.NewNotFound("user", id))
+		return services.ApiResponse(api_error.Status(err), err)
 	}
 
 	return services.ApiResponse(http.StatusOK, user)
@@ -59,7 +58,7 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.Id)),
+		Issuer:    user.Username,
 		ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
 	})
 
