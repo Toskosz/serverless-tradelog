@@ -56,7 +56,7 @@ func (s *userService) GetUserFromToken(tokenString string) (string, error) {
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// check token signing method etc
-		return []byte(os.Getenv("")), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
 	if err != nil {

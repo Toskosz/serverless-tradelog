@@ -57,12 +57,12 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 		return services.ApiResponse(http.StatusBadRequest, err)
 	}
 
+	// new jwt token
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    user.Username,
 		ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
 	})
-
-	token, err := claims.SignedString([]byte(os.Getenv("")))
+	token, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
 	if err != nil {
 		return services.ApiResponse(http.StatusInternalServerError,
