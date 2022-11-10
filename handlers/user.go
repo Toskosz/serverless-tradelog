@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Toskosz/everythingreviewed/models"
-	"github.com/Toskosz/everythingreviewed/models/api_error"
-	"github.com/Toskosz/everythingreviewed/services"
+	"github.com/Toskosz/serverless-tradelog/models"
+	"github.com/Toskosz/serverless-tradelog/models/api_error"
+	"github.com/Toskosz/serverless-tradelog/services"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/golang-jwt/jwt"
 )

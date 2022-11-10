@@ -3,8 +3,8 @@ package db
 import (
 	"os"
 
-	"github.com/Toskosz/everythingreviewed/models"
-	"github.com/Toskosz/everythingreviewed/models/api_error"
+	"github.com/Toskosz/serverless-tradelog/models"
+	"github.com/Toskosz/serverless-tradelog/models/api_error"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"

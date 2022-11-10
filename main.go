@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Toskosz/everythingreviewed/handlers"
+	"github.com/Toskosz/serverless-tradelog/handlers"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
