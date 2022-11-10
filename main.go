@@ -20,7 +20,7 @@ func handler(req events.APIGatewayProxyRequest) (
 		return h.Logout(req)
 
 		// LOG ENDPOINTS
-	} else if req.HTTPMethod == "GET" && req.Resource == "/my/logs/{log-ts}" {
+	} else if req.HTTPMethod == "GET" && req.Resource == "/my/logs/{log-abertura}" {
 		return h.GetLog(req)
 	} else if req.HTTPMethod == "GET" && req.Resource == "/my/logs" {
 		return h.GetMyLogs(req)
@@ -28,7 +28,7 @@ func handler(req events.APIGatewayProxyRequest) (
 		return h.CreateLog(req)
 	} else if req.HTTPMethod == "PUT" && req.Resource == "/my/logs" {
 		return h.UpdateLog(req)
-	} else if req.HTTPMethod == "DELETE" && req.Resource == "/my/logs/{log-ts}" {
+	} else if req.HTTPMethod == "DELETE" && req.Resource == "/my/logs/{log-abertura}" {
 		return h.DeleteLog(req)
 	} else {
 		return h.UnhandledMethod()

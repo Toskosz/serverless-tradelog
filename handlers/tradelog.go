@@ -14,7 +14,7 @@ import (
 func (h *Handler) GetLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	abertura := req.PathParameters["log-abertura"]
+	abertura := req.QueryStringParameters["log-abertura"]
 	tokenStr, _ := req.Headers["jwt"]
 	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
 
@@ -165,7 +165,7 @@ func (h *Handler) DeleteLog(req events.APIGatewayProxyRequest) (
 		return services.ApiResponse(api_error.Status(err), err)
 	}
 
-	abertura := req.PathParameters["aberturaTs"]
+	abertura := req.QueryStringParameters["log-abertura"]
 	err = h.logService.Delete(requesterUsername, abertura)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
