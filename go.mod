@@ -1,4 +1,4 @@
-module github.com/Toskosz/everythingreviewed
+module github.com/Toskosz/serverless-tradelog
 
 go 1.19
 

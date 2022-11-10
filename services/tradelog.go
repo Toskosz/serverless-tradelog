@@ -3,8 +3,8 @@ package services
 import (
 	"time"
 
-	"github.com/Toskosz/everythingreviewed/models"
-	"github.com/Toskosz/everythingreviewed/models/api_error"
+	"github.com/Toskosz/serverless-tradelog/models"
+	"github.com/Toskosz/serverless-tradelog/models/api_error"
 )
 
 type logService struct {
