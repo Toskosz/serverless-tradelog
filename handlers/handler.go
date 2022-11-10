@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Toskosz/everythingreviewed/db"
 	"github.com/Toskosz/everythingreviewed/models"
 	"github.com/Toskosz/everythingreviewed/models/api_error"
 	"github.com/Toskosz/everythingreviewed/services"
@@ -14,8 +15,14 @@ type Handler struct {
 	logService  models.InterfaceLogService
 }
 
-func NewHandler(user models.InterfaceUserService,
-	log models.InterfaceLogService) Handler {
+func NewHandler() Handler {
+
+	userData := db.NewUserDBConn("user")
+	user := services.NewUserService(userData)
+
+	logData := db.NewTradeLogDBConn("tradelogs")
+	log := services.NewLogService(logData)
+
 	return Handler{
 		userService: user,
 		logService:  log,

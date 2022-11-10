@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/Toskosz/everythingreviewed/db"
 	"github.com/Toskosz/everythingreviewed/handlers"
-	"github.com/Toskosz/everythingreviewed/services"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -11,9 +9,7 @@ import (
 func handler(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	userData := db.NewUserDBConn("user")
-	userService := services.NewUserService(userData)
-	h := handlers.NewHandler(userService)
+	h := handlers.NewHandler()
 
 	if req.HTTPMethod == "POST" && req.Path == "/register" {
 		return h.Register(req)
