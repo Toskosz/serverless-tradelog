@@ -11,12 +11,15 @@ func handler(req events.APIGatewayProxyRequest) (
 
 	h := handlers.NewHandler()
 
+	// AUTH ENDPOINTS
 	if req.HTTPMethod == "POST" && req.Resource == "/register" {
 		return h.Register(req)
 	} else if req.HTTPMethod == "POST" && req.Resource == "/login" {
 		return h.Login(req)
 	} else if req.HTTPMethod == "POST" && req.Resource == "/logout" {
 		return h.Logout(req)
+
+		// LOG ENDPOINTS
 	} else if req.HTTPMethod == "GET" && req.Resource == "/my/logs/{log-ts}" {
 		return h.GetLog(req)
 	} else if req.HTTPMethod == "GET" && req.Resource == "/my/logs" {
