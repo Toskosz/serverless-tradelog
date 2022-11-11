@@ -47,8 +47,8 @@ func (h *Handler) GetMyLogs(req events.APIGatewayProxyRequest) (
 }
 
 type createLogInput struct {
-	TimestampAbertura     string  `json:"hora-abertura"`
-	TimestampFechamento   string  `json:"hora-fechamento"`
+	TimestampAbertura     string  `json:"abertura"`
+	TimestampFechamento   string  `json:"fechamento"`
 	Ativo                 string  `json:"ativo"`
 	Resultado             float32 `json:"resultado"`
 	Contratos             int     `json:"contratos"`
@@ -110,7 +110,7 @@ func (h *Handler) CreateLog(req events.APIGatewayProxyRequest) (
 }
 
 type updateLogInput struct {
-	TimestampAbertura string `json:"hora-abertura"`
+	TimestampAbertura string `json:"abertura"`
 	Revisado          bool   `json:"revisado"`
 	Desc              string `json:"descricao"`
 }
