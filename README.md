@@ -5,7 +5,7 @@ A serverless REST API built using the AWS-SDK for golang. It has some jwt authen
 
 ## Diagram
 
-![Diagram](https://github.com/Toskosz/serverless-tradelog/main/media/serverless.png)
+![Diagram](https://github.com/Toskosz/serverless-tradelog/main/media/serverless.jpg)
 
 ## tradelog
 
