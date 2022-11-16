@@ -55,8 +55,8 @@ func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 
 	currentUser, err := r.FetchUserByUsername(user.Username)
 	if err == nil {
-		if currentUser != nil && len(currentUser.Email) != 0 {
-			return nil, api_error.NewBadRequest(api_error.DuplicateEmailError)
+		if currentUser != nil && len(currentUser.Username) != 0 {
+			return nil, api_error.NewBadRequest(api_error.DuplicateUsernameError)
 		}
 	}
 	if err.Error() == api_error.InternalError {
