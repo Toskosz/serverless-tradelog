@@ -2,7 +2,6 @@ package db
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/Toskosz/serverless-tradelog/models"
 	"github.com/Toskosz/serverless-tradelog/models/api_error"
@@ -27,14 +26,14 @@ func NewUserDBConn(table string) models.InterfaceDBUser {
 	}
 }
 
-func (r *userRecords) FindUserByEmail(email string) (*models.User, error) {
+func (r *userRecords) FetchUserByUsername(username string) (*models.User, error) {
 
 	user := &models.User{}
 
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"email": {
-				S: aws.String(email),
+			"Username": {
+				S: aws.String(username),
 			},
 		},
 		TableName: aws.String(r.tableName),
@@ -46,32 +45,7 @@ func (r *userRecords) FindUserByEmail(email string) (*models.User, error) {
 	}
 
 	if userItem.Item == nil {
-		return user, api_error.NewNotFound("email", email)
-	}
-
-	return user, nil
-}
-
-func (r *userRecords) GetUserById(id int) (*models.User, error) {
-	user := &models.User{}
-	userId := strconv.Itoa(id)
-
-	input := &dynamodb.GetItemInput{
-		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				N: aws.String(userId),
-			},
-		},
-		TableName: aws.String(r.tableName),
-	}
-
-	userItem, err := r.DB.GetItem(input)
-	if err != nil {
-		return user, api_error.NewInternal()
-	}
-
-	if userItem.Item == nil {
-		return user, api_error.NewNotFound("Id", userId)
+		return user, api_error.NewNotFound("username", username)
 	}
 
 	return user, nil
@@ -79,7 +53,7 @@ func (r *userRecords) GetUserById(id int) (*models.User, error) {
 
 func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 
-	currentUser, err := r.FindUserByEmail(user.Email)
+	currentUser, err := r.FetchUserByUsername(user.Username)
 	if err == nil {
 		if currentUser != nil && len(currentUser.Email) != 0 {
 			return nil, api_error.NewBadRequest(api_error.DuplicateEmailError)
