@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -15,13 +14,12 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func (h *Handler) GetUserById(req events.APIGatewayProxyRequest) (
+func (h *Handler) GetUserByUsername(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	id := req.PathParameters["user-id"]
-	userId, _ := strconv.Atoi(id)
+	username := req.PathParameters["username"]
 
-	user, err := h.userService.GetUserById(userId)
+	user, err := h.userService.GetUserByUsername(username)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
@@ -30,13 +28,13 @@ func (h *Handler) GetUserById(req events.APIGatewayProxyRequest) (
 }
 
 type loginInput struct {
-	Email    string
+	Username string
 	Password string
 }
 
 func (r *loginInput) sanitize() {
-	r.Email = strings.TrimSpace(r.Email)
-	r.Email = strings.ToLower(r.Email)
+	r.Username = strings.TrimSpace(r.Username)
+	r.Username = strings.ToLower(r.Username)
 	r.Password = strings.TrimSpace(r.Password)
 }
 
@@ -51,7 +49,7 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 	}
 
 	jsonData.sanitize()
-	user, err := h.userService.Login(jsonData.Email, jsonData.Password)
+	user, err := h.userService.Login(jsonData.Username, jsonData.Password)
 
 	if err != nil {
 		return services.ApiResponse(http.StatusBadRequest, err)
@@ -75,15 +73,13 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 }
 
 type registerInput struct {
-	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 func (r *registerInput) sanitize() {
 	r.Username = strings.TrimSpace(r.Username)
-	r.Email = strings.TrimSpace(r.Email)
-	r.Email = strings.ToLower(r.Email)
+	r.Username = strings.ToLower(r.Username)
 	r.Password = strings.TrimSpace(r.Password)
 }
 
@@ -99,14 +95,14 @@ func (h *Handler) Register(req events.APIGatewayProxyRequest) (
 
 	jsonData.sanitize()
 	registerUserPayload := &models.User{
-		Username: jsonData.Username,
-		Email:    jsonData.Email,
-		Password: jsonData.Password,
+		Username:  jsonData.Username,
+		Password:  jsonData.Password,
+		CreatedAt: time.Now().Format(time.RFC3339Nano),
 	}
 	user, err := h.userService.Register(registerUserPayload)
 
 	if err != nil {
-		if err.Error() == api_error.DuplicateEmailError {
+		if err.Error() == api_error.DuplicateUsernameError {
 			return services.ApiResponse(api_error.Status(err), err)
 		} else {
 			return services.ApiResponse(api_error.Status(err), err)
@@ -120,7 +116,7 @@ func (h *Handler) Logout(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	cookie := []string{"jwt=; Expires: " + time.Now().Add(-time.Hour).Format(
-		"Mon, 02 Jan 2006 15:04:05 MST",
-	)}
+		time.RFC3339Nano),
+	}
 	return services.ApiResponseWithCookies(http.StatusOK, cookie, "Logged out")
 }

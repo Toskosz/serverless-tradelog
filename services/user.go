@@ -18,9 +18,9 @@ func NewUserService(conn models.InterfaceDBUser) models.InterfaceUserService {
 	}
 }
 
-func (s *userService) Login(email string, password string) (
+func (s *userService) Login(username string, password string) (
 	*models.User, error) {
-	user, err := s.dbConn.FindUserByEmail(email)
+	user, err := s.dbConn.FetchUserByUsername(username)
 	if err != nil {
 		return nil, api_error.NewAuthorization(api_error.InvalidCredentialsError)
 	}
@@ -48,8 +48,8 @@ func (s *userService) Register(user *models.User) (*models.User, error) {
 	return s.dbConn.CreateUser(user)
 }
 
-func (s *userService) GetUserById(id int) (*models.User, error) {
-	return s.dbConn.GetUserById(id)
+func (s *userService) GetUserByUsername(username string) (*models.User, error) {
+	return s.dbConn.FetchUserByUsername(username)
 }
 
 func (s *userService) GetUserFromToken(tokenString string) (string, error) {

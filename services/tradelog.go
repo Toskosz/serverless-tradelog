@@ -54,7 +54,7 @@ func (s *logService) GetUserLogs(username string) (*[]models.TradeLog, error) {
 }
 
 func notValidTimeStamp(datetime string) bool {
-	_, err := time.Parse(time.RFC3339, datetime)
+	_, err := time.Parse(time.RFC3339Nano, datetime)
 	if err != nil {
 		return true
 	}
