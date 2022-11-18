@@ -32,3 +32,7 @@ func NewHandler() Handler {
 func (h *Handler) UnhandledMethod() (*events.APIGatewayProxyResponse, error) {
 	return services.ApiResponse(http.StatusMethodNotAllowed, api_error.NewServiceUnavailable())
 }
+
+func (h *Handler) HealthCheck(path string) (*events.APIGatewayProxyResponse, error) {
+	return services.ApiResponse(http.StatusOK, path)
+}
