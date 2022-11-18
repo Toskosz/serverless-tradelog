@@ -56,7 +56,7 @@ All calls need to have a API key in the header.
 
 | Parameter | Type 
 | :-------- | :------- 
-| `email` | `string` 
+| `username` | `string` 
 | `password` | `string` 
 
 
@@ -67,7 +67,7 @@ All calls need to have a API key in the header.
 
 | Parameter | Type     
 | :-------- | :------- 
-| `email` | `string` 
+| `username` | `string` 
 | `password` | `string` 
 
 #### logout
