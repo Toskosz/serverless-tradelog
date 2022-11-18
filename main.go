@@ -11,24 +11,30 @@ func handler(req events.APIGatewayProxyRequest) (
 
 	h := handlers.NewHandler()
 
+	if req.HTTPMethod == "GET" && req.Path == "/healthcheck" {
+		return h.HealthCheck(req.Path)
+	}
+
 	// AUTH ENDPOINTS
-	if req.HTTPMethod == "POST" && req.Path == "api/register" {
+	if req.HTTPMethod == "POST" && req.Path == "/register" {
 		return h.Register(req)
-	} else if req.HTTPMethod == "POST" && req.Path == "api/login" {
+	} else if req.HTTPMethod == "POST" && req.Path == "/login" {
 		return h.Login(req)
-	} else if req.HTTPMethod == "POST" && req.Path == "api/logout" {
+	} else if req.HTTPMethod == "POST" && req.Path == "/logout" {
 		return h.Logout(req)
 
 		// LOG ENDPOINTS
-	} else if req.HTTPMethod == "GET" && req.Path == "api/my/logs/" {
-		return h.GetLog(req)
-	} else if req.HTTPMethod == "GET" && req.Path == "api/my/logs" {
-		return h.GetMyLogs(req)
-	} else if req.HTTPMethod == "POST" && req.Path == "api/my/logs" {
+	} else if req.HTTPMethod == "GET" && req.Path == "/my/logs" {
+		if _, ok := req.QueryStringParameters["log-abertura"]; ok {
+			return h.GetLog(req)
+		} else {
+			return h.GetMyLogs(req)
+		}
+	} else if req.HTTPMethod == "POST" && req.Path == "/my/logs" {
 		return h.CreateLog(req)
-	} else if req.HTTPMethod == "PUT" && req.Path == "api/my/logs" {
+	} else if req.HTTPMethod == "PUT" && req.Path == "/my/logs" {
 		return h.UpdateLog(req)
-	} else if req.HTTPMethod == "DELETE" && req.Path == "api/my/logs/" {
+	} else if req.HTTPMethod == "DELETE" && req.Path == "/my/logs" {
 		return h.DeleteLog(req)
 	} else {
 		return h.UnhandledMethod()
@@ -38,3 +44,7 @@ func handler(req events.APIGatewayProxyRequest) (
 func main() {
 	lambda.Start(handler)
 }
+
+// else if req.HTTPMethod == "GET" && req.Path == "/my/logs" {
+//	return h.GetMyLogs(req)
+//}
