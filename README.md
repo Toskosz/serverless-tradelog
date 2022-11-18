@@ -42,10 +42,16 @@ For best practices purposes `JWT_SECRET`  should be in stored in the secrets man
 
 All calls need to have a API key in the header. 
 
+#### Healthchecks API
+
+```http
+  GET /healthcheck
+```
+
 #### Register new user
 
 ```http
-  POST /api/register
+  POST /register
 ```
 
 | Parameter | Type 
@@ -56,7 +62,7 @@ All calls need to have a API key in the header.
 
 #### login
 ```http
-  POST /api/login
+  POST /login
 ```
 
 | Parameter | Type     
@@ -67,26 +73,21 @@ All calls need to have a API key in the header.
 #### logout
 
 ```http
-  POST /api/logout
+  POST /logout
 ```
 
-#### Get specific log
+#### Get user logs
 ```http
   GET /api/my/logs/?log-abertura=YYYY-MM-DDTHH:MM:SSZ
 ```
 
 | Parameter | Type | Description
 | :-------- | :------- | :-------
-| `log-abertura` | `string` | Datetime of the start of the operation
-
-#### Get all user logs
-```http
-  GET /api/my/logs
-```
+| `log-abertura` | `string` | Datetime of the start of the operation, if not informed gets all logs
 
 #### Create log
 ```http
-  POST /api/my/logs
+  POST /my/logs
 ```
 
 The following parameters must be in the request body:
@@ -108,7 +109,7 @@ The following parameters must be in the request body:
 
 #### Update log
 ```http
-  PUT /api/my/logs
+  PUT /my/logs
 ```
 
 The following parameters must be in the request body:
@@ -121,7 +122,7 @@ The following parameters must be in the request body:
 
 #### Delete specific log
 ```http
-  DELETE /api/my/logs/?log-abertura=YYYY-MM-DDTHH:MM:SSZ
+  DELETE /my/logs/?log-abertura=YYYY-MM-DDTHH:MM:SSZ
 ```
 
 | Parameter | Type | Description
