@@ -40,7 +40,7 @@ func comparePasswords(storedPassword string, suppliedPassword string) (bool, err
 	pwsalt := strings.Split(storedPassword, ".")
 
 	if len(pwsalt) < 2 {
-		return false, fmt.Errorf("did not provide a valid hash")
+		return false, fmt.Errorf(storedPassword)
 	}
 
 	salt, err := hex.DecodeString(pwsalt[1])

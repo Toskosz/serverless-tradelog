@@ -27,7 +27,7 @@ func (s *userService) Login(username string, password string) (
 
 	match, err := comparePasswords(user.Password, password)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	if !match {

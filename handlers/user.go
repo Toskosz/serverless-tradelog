@@ -28,8 +28,8 @@ func (h *Handler) GetUserByUsername(req events.APIGatewayProxyRequest) (
 }
 
 type loginInput struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (r *loginInput) sanitize() {
@@ -64,7 +64,7 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 
 	if err != nil {
 		return services.ApiResponse(http.StatusInternalServerError,
-			api_error.NewInternal())
+			api_error.NewUnsupportedMediaType(err.Error()))
 	}
 
 	cookie := []string{"jwt=" + token}

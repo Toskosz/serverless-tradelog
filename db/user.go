@@ -32,7 +32,7 @@ func (r *userRecords) FetchUserByUsername(username string) (*models.User, error)
 
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"Username": {
+			"username": {
 				S: aws.String(username),
 			},
 		},
@@ -41,11 +41,16 @@ func (r *userRecords) FetchUserByUsername(username string) (*models.User, error)
 
 	userItem, err := r.DB.GetItem(input)
 	if err != nil {
-		return user, api_error.NewInternal()
+		return user, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	if userItem.Item == nil {
 		return user, api_error.NewNotFound("username", username)
+	}
+
+	err = dynamodbattribute.UnmarshalMap(userItem.Item, user)
+	if err != nil {
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	return user, nil
@@ -60,12 +65,12 @@ func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 		}
 	}
 	if err.Error() == api_error.InternalError {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	dynamoItem, err := dynamodbattribute.MarshalMap(user)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 	dynamoInput := &dynamodb.PutItemInput{
 		Item:      dynamoItem,
@@ -73,7 +78,7 @@ func (r *userRecords) CreateUser(user *models.User) (*models.User, error) {
 	}
 	_, err = r.DB.PutItem(dynamoInput)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	return user, nil

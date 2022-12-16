@@ -33,10 +33,10 @@ func (r *logRecords) GetLog(username string, aberturaTs string) (
 
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"Username": {
+			"username": {
 				N: aws.String(username),
 			},
-			"Abertura": {
+			"abertura": {
 				N: aws.String(aberturaTs),
 			},
 		},
@@ -45,7 +45,7 @@ func (r *logRecords) GetLog(username string, aberturaTs string) (
 
 	logItem, err := r.DB.GetItem(input)
 	if err != nil {
-		return log, api_error.NewInternal()
+		return log, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	if logItem.Item == nil {
@@ -58,10 +58,10 @@ func (r *logRecords) GetLog(username string, aberturaTs string) (
 func (r *logRecords) GetLogsByUsername(username string) (
 	*[]models.TradeLog, error) {
 
-	filt := expression.Name("Username").Equal(expression.Value(username))
+	filt := expression.Name("username").Equal(expression.Value(username))
 	expr, err := expression.NewBuilder().WithFilter(filt).Build()
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	params := &dynamodb.ScanInput{
@@ -75,7 +75,7 @@ func (r *logRecords) GetLogsByUsername(username string) (
 	// Make the DynamoDB Query API call
 	result, err := r.DB.Scan(params)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	item := new([]models.TradeLog)
@@ -87,7 +87,7 @@ func (r *logRecords) CreateLog(log *models.TradeLog) (*models.TradeLog, error) {
 
 	dynamoItem, err := dynamodbattribute.MarshalMap(log)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 	dynamoInput := &dynamodb.PutItemInput{
 		Item:      dynamoItem,
@@ -95,7 +95,7 @@ func (r *logRecords) CreateLog(log *models.TradeLog) (*models.TradeLog, error) {
 	}
 	_, err = r.DB.PutItem(dynamoInput)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	return log, nil
@@ -114,10 +114,10 @@ func (r *logRecords) UpdateLog(log *models.TradeLog) (*models.TradeLog, error) {
 		},
 		TableName: aws.String(r.tableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"Username": {
+			"username": {
 				S: aws.String(log.Username),
 			},
-			"Abertura": {
+			"abertura": {
 				S: aws.String(log.TimestampAbertura),
 			},
 		},
@@ -127,7 +127,7 @@ func (r *logRecords) UpdateLog(log *models.TradeLog) (*models.TradeLog, error) {
 
 	_, err := r.DB.UpdateItem(input)
 	if err != nil {
-		return nil, api_error.NewInternal()
+		return nil, api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	return log, nil
@@ -137,10 +137,10 @@ func (r *logRecords) DeleteLog(username string, aberturaTs string) error {
 
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			"Username": {
+			"username": {
 				N: aws.String(username),
 			},
-			"Abertura": {
+			"abertura": {
 				N: aws.String(aberturaTs),
 			},
 		},
@@ -150,7 +150,7 @@ func (r *logRecords) DeleteLog(username string, aberturaTs string) error {
 
 	// Failed to delete
 	if err != nil {
-		return api_error.NewInternal()
+		return api_error.NewUnsupportedMediaType(err.Error())
 	}
 
 	// Tried to delete item not present
