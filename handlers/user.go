@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/Toskosz/serverless-tradelog/models/api_error"
 	"github.com/Toskosz/serverless-tradelog/services"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/golang-jwt/jwt"
 )
 
 func (h *Handler) GetUserByUsername(req events.APIGatewayProxyRequest) (
@@ -55,19 +53,11 @@ func (h *Handler) Login(req events.APIGatewayProxyRequest) (
 		return services.ApiResponse(http.StatusBadRequest, err)
 	}
 
-	// new jwt token
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    user.Username,
-		ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
-	})
-	token, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
-
+	signedToken, err := h.userService.NewToken(user.Username)
 	if err != nil {
-		return services.ApiResponse(http.StatusInternalServerError,
-			api_error.NewUnsupportedMediaType(err.Error()))
+		return services.ApiResponse(api_error.Status(err), err)
 	}
-
-	cookie := []string{"jwt=" + token}
+	cookie := []string{"jwt=" + signedToken}
 
 	return services.ApiResponseWithCookies(http.StatusOK, cookie, user)
 }
