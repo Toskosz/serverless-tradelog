@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"regexp"
 
 	"github.com/Toskosz/serverless-tradelog/db"
 	"github.com/Toskosz/serverless-tradelog/models"
@@ -36,14 +35,4 @@ func (h *Handler) UnhandledMethod() (*events.APIGatewayProxyResponse, error) {
 
 func (h *Handler) HealthCheck(path string) (*events.APIGatewayProxyResponse, error) {
 	return services.ApiResponse(http.StatusOK, path)
-}
-
-func (h *Handler) GetCookieByName(cookieName string, rawCookie string) (string, error) {
-	r := regexp.MustCompile(cookieName + `=\s*(.*?)\s*; `)
-	match := r.FindStringSubmatch(rawCookie)
-	if len(match) > 0 {
-		return match[1], nil
-	} else {
-		return "", api_error.NewBadRequest("Bad payload")
-	}
 }

@@ -15,7 +15,7 @@ func (h *Handler) GetLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	abertura := req.QueryStringParameters["log-abertura"]
-	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	tokenStr, err := services.GetCookieByName("jwt", req.Headers["Cookie"])
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
@@ -32,7 +32,7 @@ func (h *Handler) GetLog(req events.APIGatewayProxyRequest) (
 func (h *Handler) GetMyLogs(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	tokenStr, err := services.GetCookieByName("jwt", req.Headers["Cookie"])
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
@@ -75,7 +75,7 @@ func (i *createLogInput) sanitize() {
 func (h *Handler) CreateLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	tokenStr, err := services.GetCookieByName("jwt", req.Headers["Cookie"])
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
@@ -132,7 +132,7 @@ func (h *Handler) UpdateLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	// get user
-	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	tokenStr, err := services.GetCookieByName("jwt", req.Headers["Cookie"])
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
@@ -171,7 +171,7 @@ func (h *Handler) DeleteLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	// get user
-	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	tokenStr, err := services.GetCookieByName("jwt", req.Headers["Cookie"])
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
 	}
