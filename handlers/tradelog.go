@@ -15,9 +15,12 @@ func (h *Handler) GetLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	abertura := req.QueryStringParameters["log-abertura"]
-	tokenStr, _ := req.Headers["jwt"]
-	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
+	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	if err != nil {
+		return services.ApiResponse(api_error.Status(err), err)
+	}
 
+	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
 	log, err := h.logService.GetLog(requesterUsername, abertura)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
@@ -29,9 +32,10 @@ func (h *Handler) GetLog(req events.APIGatewayProxyRequest) (
 func (h *Handler) GetMyLogs(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	// If the requests get here then we are sure the token exists
-	// because of the middleware
-	tokenStr, _ := req.Headers["jwt"]
+	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	if err != nil {
+		return services.ApiResponse(api_error.Status(err), err)
+	}
 
 	username, err := h.userService.GetUserFromToken(tokenStr)
 	if err != nil {
@@ -71,7 +75,11 @@ func (i *createLogInput) sanitize() {
 func (h *Handler) CreateLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
-	tokenStr, _ := req.Headers["jwt"]
+	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	if err != nil {
+		return services.ApiResponse(api_error.Status(err), err)
+	}
+
 	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
@@ -124,7 +132,11 @@ func (h *Handler) UpdateLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	// get user
-	tokenStr, _ := req.Headers["jwt"]
+	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	if err != nil {
+		return services.ApiResponse(api_error.Status(err), err)
+	}
+
 	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
@@ -159,7 +171,10 @@ func (h *Handler) DeleteLog(req events.APIGatewayProxyRequest) (
 	*events.APIGatewayProxyResponse, error) {
 
 	// get user
-	tokenStr, _ := req.Headers["jwt"]
+	tokenStr, err := h.GetCookieByName("jwt", req.Headers["Cookie"])
+	if err != nil {
+		return services.ApiResponse(api_error.Status(err), err)
+	}
 	requesterUsername, err := h.userService.GetUserFromToken(tokenStr)
 	if err != nil {
 		return services.ApiResponse(api_error.Status(err), err)
