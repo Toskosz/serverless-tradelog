@@ -2,6 +2,7 @@ package services
 
 import (
 	"os"
+	"time"
 
 	"github.com/Toskosz/serverless-tradelog/models"
 	"github.com/Toskosz/serverless-tradelog/models/api_error"
@@ -27,7 +28,7 @@ func (s *userService) Login(username string, password string) (
 
 	match, err := comparePasswords(user.Password, password)
 	if err != nil {
-		return nil, api_error.NewUnsupportedMediaType(err.Error())
+		return nil, api_error.NewInternal()
 	}
 
 	if !match {
@@ -54,19 +55,47 @@ func (s *userService) GetUserByUsername(username string) (*models.User, error) {
 
 func (s *userService) GetUserFromToken(tokenString string) (string, error) {
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// check token signing method etc
-		return []byte(os.Getenv("JWT_SECRET")), nil
-	})
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&customClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			// check token signing method etc
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		},
+	)
 
 	if err != nil {
-		return "", api_error.NewAuthorization("failed to get user from token")
+		return "", api_error.NewAuthorization("failed to auth user session")
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		username := claims["Issuer"].(string)
-		return username, nil
+	if claims, ok := token.Claims.(*customClaims); ok && token.Valid {
+		return claims.Username, nil
 	} else {
 		return "", api_error.NewAuthorization("failed to get user from token")
 	}
+}
+
+type customClaims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
+func (s *userService) NewToken(username string) (string, error) {
+
+	// new jwt token
+	claims := customClaims{
+		Username: username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
+			Issuer:    "tradelogs",
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+	if err != nil {
+		return "", api_error.NewInternal()
+	}
+
+	return signedToken, nil
 }
