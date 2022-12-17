@@ -17,7 +17,7 @@ type InterfaceLogService interface {
 }
 
 type TradeLog struct {
-	Username              string  `json:"user-id"`
+	Username              string  `json:"username"`
 	TimestampAbertura     string  `json:"abertura"`
 	TimestampFechamento   string  `json:"fechamento"`
 	Ativo                 string  `json:"ativo"`
